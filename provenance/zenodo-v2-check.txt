@@ -1,0 +1,7 @@
+zkp_ecc_zenodo_v2.zip  md5 ba8f4593dcdcf9bdbc4db6b40f92cde1
+source: https://zenodo.org/records/19597130 (DOI 10.5281/zenodo.19597130, v2, CC BY 4.0)
+checked: 2026-08-06T19:16:03Z
+
+lib/src/sim.rs: byte-identical to the derived source
+lib/src/circuit.rs: byte-identical to the derived source
+lib/src/weierstrass_elliptic_curve.rs: identical ignoring rustfmt wrapping and the equivalent U256 re-export

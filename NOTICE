@@ -1,0 +1,81 @@
+Third-party attribution
+=======================
+
+This project is Apache-2.0 (see LICENSE), except for the parts identified below, which are
+derived from work licensed CC BY 4.0 and are used under that licence.
+
+Upstream
+--------
+
+    Data for "Securing Elliptic Curve Cryptocurrencies against Quantum Vulnerabilities:
+    Resource Estimates and Mitigations"
+    Ryan Babbush, Adam Zalcman, Craig Gidney, Michael Broughton, Tanuj Khattar,
+    Hartmut Neven, Thiago Bergamaschi, Justin Drake, Dan Boneh
+    Google Research; Google LLC; Stanford University
+    Zenodo, 15 April 2026, v2. DOI 10.5281/zenodo.19597130
+    Licence: Creative Commons Attribution 4.0 International (CC BY 4.0)
+             https://creativecommons.org/licenses/by/4.0/
+
+The licence attaches to the Zenodo deposit. The GitHub mirror at
+https://github.com/tanujkhattar/zkp_ecc carries no licence file and should not be relied on as
+the grant.
+
+Provenance, checked rather than assumed: `zkp_ecc_zenodo_v2.zip`, md5
+`ba8f4593dcdcf9bdbc4db6b40f92cde1`, matching the Zenodo record. Its `lib/src/sim.rs` and
+`lib/src/circuit.rs` are byte-identical to the sources this project derives from;
+`lib/src/weierstrass_elliptic_curve.rs` is identical up to rustfmt line-wrapping and an
+equivalent `U256` re-export. The check is recorded in `provenance/zenodo-v2-check.txt`.
+
+Derived files, and what is taken
+--------------------------------
+
+    guest/src/sim.rs
+        Transliteration of upstream `lib/src/sim.rs`. Every gate arm and the measurement-coin
+        protocol are upstream's semantics, including the HMR/R conditioning added in upstream's
+        post-review v2. The condition stack is upstream's except that an unbalanced
+        PopCondition is fatal here rather than ignored. Adapted to a packed operation
+        encoding, with gate accounting folded into the same dispatch arm as execution.
+
+    guest/src/ops.rs
+        The operation format and `OperationType` discriminants follow upstream
+        `lib/src/circuit.rs`. `validate_one` is a transliteration of upstream `Op::validate`,
+        including its BANNED / ALLOWED / REQUIRED field policy; it additionally range-checks
+        operands against the layout, bounds `r_target`, and refuses `DebugPrint`. The register
+        composition rules follow upstream `program/src/main.rs`, and additionally require the
+        register slots to be distinct. The packed encoding and the streaming analyser are not
+        upstream's.
+
+    guest/src/curve.rs
+        `add` and `mul_reference` are transliterated from upstream
+        `lib/src/weierstrass_elliptic_curve.rs`, including the affine formulae and the encoding
+        of the point at infinity as (0, 0). `mul_generator` is not upstream's.
+
+    guest/src/main.rs
+        The proof procedure — commit to the circuit, derive test inputs from its hash, simulate,
+        assert resource bounds — follows the design of upstream `program/src/main.rs`. The
+        Fiat-Shamir derivation is byte-identical to the ecdsa.fail evaluator's by necessity: a
+        proof computed over any other transcript would certify a different test set than the
+        benchmark draws. The check is recorded in `provenance/evaluator-check.txt`.
+
+    host/tests/curve_parity.rs
+        Contains a second copy of the upstream curve arithmetic above, as the reference oracle.
+
+    host/tests/validation.rs
+        Includes `guest/src/ops.rs` textually, and so carries the derived code named there.
+
+Everything else is original to doubleAI.
+
+Changes
+-------
+
+The derived files have been modified: transliterated to a different operation encoding,
+restructured so that gate accounting cannot diverge from gate execution, and extended with
+validation beyond upstream's. They are not upstream's files and should not be attributed to
+upstream as shipped.
+
+Disclaimer
+----------
+
+Unless otherwise separately undertaken by the Licensor, to the extent possible, the Licensor
+offers the Licensed Material as-is and as-available, and makes no representations or warranties
+of any kind concerning the Licensed Material, whether express, implied, statutory, or other.

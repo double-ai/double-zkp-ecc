@@ -1,0 +1,28 @@
+Fiat-Shamir derivation: checked against the evaluator, not assumed.
+
+The guest derives its test inputs exactly as the benchmark evaluator does. A proof computed over any
+other transcript would certify a different test set than the benchmark draws, so this is checked
+rather than asserted.
+
+Evaluator: strong_verify.rs, fn pinned_evaluator_seed.
+Guest:     guest/src/main.rs (absorb) and guest/src/ops.rs, fn fs_bytes (per-op encoding).
+
+Absorbed message, identical in both:
+
+    SHAKE256
+      "quantum_ecc-fiat-shamir-v2"          domain tag
+      (op count as u64, little endian)      length prefix
+      for each op, in stream order:
+        kind as one byte
+        q_control2, q_control1, q_target, c_target, c_condition, r_target
+        each as u64 little endian           49 bytes per op
+
+Squeeze order, identical in both: for each of the 9,024 tests, two 32-byte reads (target scalar then
+offset scalar) from one continuing reader; the measurement coins are drawn from that same reader after
+every test input, so the coin stream continues where input generation left off.
+
+Skip conditions, identical in both: a draw is skipped when the two points share an x-coordinate, or
+when either is the point at infinity, encoded (0, 0). The guest additionally requires that no draw was
+skipped, so all 9,024 graded inputs have distinct x.
+
+Field order is the one place this could silently diverge: both absorb q_control2 before q_control1.

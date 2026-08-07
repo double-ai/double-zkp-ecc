@@ -1,0 +1,37 @@
+[package]
+name = "point-add-zk-guest"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0 AND CC-BY-4.0"
+
+[[bin]]
+name = "point-add-zk-guest"
+path = "src/main.rs"
+
+[dependencies]
+sp1-zkvm = "6.3.1"
+ruint = { version = "1.12", default-features = false }
+sha2 = "0.10.9"
+sha3 = "0.10"
+k256 = { version = "0.13", default-features = false, features = ["arithmetic"], optional = true }
+elliptic-curve = { version = "0.13", default-features = false, features = ["sec1"], optional = true }
+
+[features]
+default = ["precompiled-ec"]
+# Route k*G through SP1's accelerated secp256k1 rather than the reference affine double-and-add.
+# Mandatory in practice: the reference path is 384 affine point operations per scalar, each with a
+# modular inversion, times 18,048 scalars. Checked against the reference in `tests/curve_parity.rs`.
+precompiled-ec = ["dep:k256", "dep:elliptic-curve"]
+
+# SP1's patched crates route hashing and field arithmetic through zkVM precompiles. Without these
+# the proof is arithmetically identical and computationally out of reach: SHAKE256 alone absorbs
+# ~496 MB of transcript, and the guest does 18,048 scalar multiplications.
+[patch.crates-io]
+sha2 = { git = "https://github.com/sp1-patches/RustCrypto-hashes", package = "sha2", tag = "patch-sha2-0.10.9-sp1-6.2.0" }
+sha3 = { git = "https://github.com/sp1-patches/RustCrypto-hashes", package = "sha3", tag = "patch-sha3-0.10.8-sp1-6.2.0" }
+k256 = { git = "https://github.com/sp1-patches/elliptic-curves", tag = "patch-k256-13.4-sp1-6.2.0" }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

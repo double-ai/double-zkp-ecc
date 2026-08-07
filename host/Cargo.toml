@@ -1,0 +1,30 @@
+[package]
+name = "point-add-zk-host"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0 AND CC-BY-4.0"
+
+[[bin]]
+name = "point-add-zk"
+path = "src/main.rs"
+
+[dependencies]
+sp1-sdk = { version = "6.3.1", features = ["blocking"] }
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+hex = "0.4"
+sha2 = "0.10"
+zstd = "0.13"
+
+[dev-dependencies]
+k256 = { version = "0.13", features = ["arithmetic"] }
+elliptic-curve = { version = "0.13", features = ["sec1"] }
+ruint = "1.12"
+sha3 = "0.10"
+
+[build-dependencies]
+sp1-build = "6.3.1"
+
+[features]
+# Proving needs a GPU; verifying does not.
+cuda = ["sp1-sdk/cuda"]
