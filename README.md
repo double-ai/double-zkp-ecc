@@ -1,5 +1,9 @@
 # Zero-knowledge proof of resource costs — secp256k1 point addition
 
+This is a zero-knowledge proof that our WarpSpeed quantum circuit exists and achieves the resource cost we claim, without revealing the circuit itself.
+We publish the proof rather than the circuit, so the result is independently verifiable while the circuit remains private. 
+For more details, see https://www.doubleai.com/research/warpspeed-discovers-record-breaking-ecdsa-cracking-circuit
+
 **doubleAI** · produced by WarpSpeed
 
 > **Zero Knowledge Proof Statement (doubleAI, WarpSpeed).** We possess a quantum kickmix circuit
